@@ -1,0 +1,32 @@
+
+models folder contains all the table structures, and base.py contains the instance of decalarative base from which we extend other table structures
+
+routes folder contains all routes
+
+schemas contains all the classes we create for request body to be sent with the request which extends BaseModel
+
+def get_db():
+    db = sessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()   
+
+here we have a created a function for injecting db as a dependency, db value is assigned and then we yield the db and the dependency is going to get 
+resolved and the endpoint func is going to run and then the finally block is going to get executed
+
+here we take care of lifecycle management, as db is utilized throughout the api route func and then after dependency is resolved its closed.
+
+
+app = FastAPI()
+app.include_router(router, prefix='/auth')
+this is done so as to include all the new routes created into fastapi so that we dont have to create a new instance of fastapi everytime 
+a new route is created and we give a different perfix for different set of routes, for that we can create different instances of APIRouter
+
+error status codes - 
+415 - unsupported media type
+422 - Unprocessable entity - occurs when the server cant understand the request body due to incorrect or missing fields
+for this ensure the fields provided in req body and keys are the same while hitting the endpoint in repos files
+
+activating virtual environment - .\venv\Scripts\activate in Windows
+to deactivate - use "deactivate" while inside the vir env

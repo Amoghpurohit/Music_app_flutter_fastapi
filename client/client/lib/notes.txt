@@ -1,0 +1,107 @@
+
+In this project, we are implementing feature wise development where we define a feature and implement MVVM for individual features
+hence files and classes used in one feature file cannot be used in different feature files
+This is done for when we want to remove a feature then we can simply remove that folder and the entire functionality 
+is removed and we would get very less errors.
+
+reasons to use stateful widgets- if we are using a text contoller we would want to dispose that using the dispose method provided by 
+stateful widget
+
+creating our own Pallete class consisting of static final colors, to later on use them in out App theme
+to set themes of different widgets or text..
+
+like we did in theme.dart, if we have to change colors or anything for the same widget 
+we can create a static variable of that type and provide a parameter makeing it reuseable
+
+inside auth we have remote repo where we interact with the server side and utilizing out routes to hit requests and handle success and failure responses
+
+We use "Either" from fpdart package provied by dart to assign the return type to the func incase of success(Right) and failure(Left)
+
+we get the resp in json(String) and decode it "as" map of String and dynamic and use that Failure(respInMap['key']) and incase of success we use-
+Data Classes -> are used to for encapsulation(binding or organizing instance variables and methods together) and to 
+store model data as easier to deal with than map as its always better to have the model of the json.
+
+It is quite important to wrap our response type with AsyncValue as its helps us in not forgetting about handling loading and errors states in async operations/our responses.
+
+We have viewmodel(for state management) watching for changes in model(response)(repositories in project) and view(UI) watching viewmodel for changes done using riverpod 
+ref.read() on functions, ref.listen(provider, (prev, next){ next.when(data){}, (error, stacktrace){}, (loading){} }) here we can return widgets to display as per each of the results
+
+how viewmodel is build - 
+
+
+
+implementing JWT(json Web token) for auth persistence and getting user data(payload) - 
+Architecture - first user signs in, if first time signing in after creating acc then a JWT has to be generated for this - 
+ JWT is made up of 2 components - payload(user provided data) and salt or secret/private key.
+
+ then this JWT is returned by the auth server, then we make a get request to the /protected-resource by passing the Auth: Bearer <JWT> and if the verification is a success then
+ we are granted access to protected-resource, now this verification is done by breaking/decoding the JWT and getting the user details out of it, if they are valid the we log the user in. 
+
+another simplier approach to implement would be - 
+when user hits a post request with email and password we create a JWT with a secret for that user, then pass it to the application, and when user again opens/restarts the app
+then we hit the auth server with a get req with JWT token, gets the user info from JWT and sends the response to client and signs the user in
+
+ProviderContainer - 
+ProviderContainer is used to manage the state of providers outside of the widget tree. It allows you to:
+
+Read Providers: Access the current state of a provider.
+Override Providers: Provide a custom implementation of a provider.
+Manipulate Providers: Perform operations like adding, updating, or removing providers.
+
+UncontrolledProviderScope
+UncontrolledProviderScope is used to pass a ProviderContainer to the widget tree, allowing the app to use the state managed by the container.
+It is typically used when you need to initialize providers or perform operations outside the widget tree and then pass the state to the app.
+That state change or whatever is done outside of the widget tree using the proivider scope is now passed to widget tree using the UncontrolledProviderScope.
+
+notifierProvider is used when u want to watch for a change and update that by rebuilding the widget tree(just like ref.watch().when()) 
+and Provider is used when u simply want to perform an action, just list ref.listen()
+
+hero widget can be used to introduce simple animations between 2 widgets 
+
+always try to use mediaQuery to give a resolution-friendly UI, and use Flexible widget and Expanded for clear spacings,
+inkwell instead of gestureDetector for splash color and focus colors, use Container for gradients and image(NetworkImage)
+
+Providers -
+    Definition: In the context of Riverpod (or other state management solutions), providers are mechanisms to supply instances of classes or manage their lifecycle.
+    Example: homeRepositoryProvider is a Riverpod provider that supplies an instance of HomeRepository.
+
+You need to add the following permission to grant your application to use the internet.
+<uses-permission android:name="android.permission.INTERNET" /> 
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+models depending on other models and if so we need to update their data in viewModels so that a state is maintained globally (to whichever notifierProvider is watching it)
+
+        About ref.invalidate(provider) ----------------------------------->
+
+The ref.invalidate(someProvider) method in Riverpod is used to force a provider to recompute its value the next time it's accessed. This is particularly useful when you need to refresh or invalidate cached data, or trigger a new fetch of data when some condition changes. Here's how it works and when you might use it:
+
+What ref.invalidate(someProvider) Does
+Invalidate the Provider: When you call ref.invalidate(someProvider), the current value of the provider is marked as invalid. This means the next time the provider is watched or accessed, it will automatically recompute its value by rerunning its associated function.
+Clear Cached Data: If the provider was caching data (like the result of an API call), that cached data will be cleared, and the provider will re-fetch or recompute the data.
+When to Use ref.invalidate
+Refreshing Data: If your app fetches data from an API, and you want to ensure the data is up-to-date when certain actions are taken (e.g., a user manually refreshes a page), you can invalidate the provider to force a new fetch.
+
+
+void refreshData(WidgetRef ref) {
+  ref.invalidate(dataProvider);
+}
+Invalidating on Event: You might want to invalidate a provider when a specific event occurs, such as a user logging out, which would clear user-specific data.
+
+
+void onLogout(WidgetRef ref) {
+  ref.invalidate(userDataProvider);
+}
+After an Update: If you update data (like submitting a form or saving changes), you may want to invalidate a provider to ensure that the displayed data reflects the most recent changes.
+
+
+Future<void> saveData(WidgetRef ref) async {
+  await saveDataToApi();
+  ref.invalidate(dataProvider);
+}
+
+features to add -------> 
+more code refactoring
+logout function
+play next and previous function
+shuffle function
+add new ui to library page and create new playlist functionality
